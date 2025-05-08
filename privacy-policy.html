@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>名前暗号化アプリ - プライバシーポリシー</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f8f8;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        h1 {
+            color: #0066cc;
+            margin-bottom: 10px;
+        }
+        h2 {
+            color: #333;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }
+        .content {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #666;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            color: #0066cc;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>名前暗号化アプリ</h1>
+        <p>プライバシーポリシー</p>
+    </header>
+
+    <div class="content">
+        <h2>はじめに</h2>
+        <p>当プライバシーポリシーは、名前暗号化アプリ（以下「本アプリ」）の利用において、ユーザーの個人情報の取り扱いについて説明するものです。本アプリを利用することにより、ユーザーは本プライバシーポリシーに同意したものとみなされます。</p>
+
+        <h2>収集する情報</h2>
+        <p>本アプリでは、以下の情報を収集する場合があります：</p>
+        <ol>
+            <li><strong>ユーザーが提供する情報</strong>: 暗号化または復号化のために入力された名前やテキスト情報</li>
+            <li><strong>デバイス情報</strong>: アプリの利用状況を改善するためのデバイス情報（OSバージョン、デバイスモデル等）</li>
+        </ol>
+
+        <h2>情報の利用目的</h2>
+        <p>収集した情報は以下の目的のために利用されます：</p>
+        <ol>
+            <li>本アプリの機能提供およびサービスの向上</li>
+            <li>技術的な問題の診断と解決</li>
+            <li>アプリのパフォーマンス分析と改善</li>
+        </ol>
+
+        <h2>情報の保管</h2>
+        <p>本アプリは暗号化および復号化の処理をすべてユーザーのデバイス上で行います。入力された名前やキーはサーバーに送信されず、ローカルでのみ処理されます。</p>
+
+        <h2>第三者への情報提供</h2>
+        <p>当社は、以下の場合を除き、収集した情報を第三者と共有しません：</p>
+        <ol>
+            <li>ユーザーの同意がある場合</li>
+            <li>法的要請に応じる必要がある場合</li>
+            <li>当社の権利、財産、安全を保護する必要がある場合</li>
+        </ol>
+
+        <h2>クッキーとトラッキング技術</h2>
+        <p>本アプリは、クッキーやその他のトラッキング技術を使用していません。</p>
+
+        <h2>データセキュリティ</h2>
+        <p>当社は、収集した情報を不正アクセス、改ざん、漏洩から保護するために、適切なセキュリティ対策を講じています。本アプリではWeb Crypto APIを使用した標準的な暗号化技術を採用しています。</p>
+
+        <h2>お子様のプライバシー</h2>
+        <p>本アプリは、13歳未満の子供から意図的に個人情報を収集することはありません。13歳未満のお子様が個人情報を提供されたことが判明した場合、直ちにその情報を削除いたします。</p>
+
+        <h2>プライバシーポリシーの変更</h2>
+        <p>当社は、必要に応じて本プライバシーポリシーを変更することがあります。変更があった場合は、本アプリまたは当社のウェブサイトを通じて通知します。</p>
+
+        <h2>お問い合わせ</h2>
+        <p>本プライバシーポリシーに関するご質問やご懸念がある場合は、以下の連絡先までお問い合わせください：</p>
+        <p>メールアドレス: [あなたのメールアドレス]</p>
+
+        <h2>発効日</h2>
+        <p>本プライバシーポリシーは2025年5月8日より有効です。</p>
+
+        <a href="index.html" class="back-link">ホームページに戻る</a>
+    </div>
+
+    <footer>
+        <p>© 2025 名前暗号化アプリ. All rights reserved.</p>
+    </footer>
+    
+    <script>
+        // Service Workerの登録
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js');
+            });
+        }
+    </script>
+</body>
+</html>
