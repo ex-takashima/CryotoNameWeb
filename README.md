@@ -36,7 +36,7 @@
 
 1. リポジトリをクローン：
    ```bash
-   git clone https://github.com/あなたのユーザー名/name-encryption-app.git
+   git clone https://github.com/ex-takashima/CryotoNameWeb.git
    ```
 
 2. お好みのウェブサーバーでホスティング（HTTPS必須）：
