@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>名前暗号化アプリ</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="images/icon-192x192.png">
+    <meta name="theme-color" content="#0066cc">
+    <style>
+        /* リセットCSS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f8f8;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #0066cc;
+            margin: 10px 0;
+            font-size: 1.8rem;
+        }
+        
+        .app-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto;
+            background-color: #0066cc;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #0066cc;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        input[type="text"], 
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        button {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        button.secondary {
+            background-color: #6c757d;
+        }
+        
+        .divider {
+            height: 1px;
+            background-color: #eee;
+            margin: 30px 0;
+        }
+        
+        .result-box {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            word-break: break-all;
+            min-height: 50px;
+        }
+        
+        .result-label {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+        
+        .install-banner {
+            background-color: #f0f8ff;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #0066cc;
+            display: none;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="app-icon">🔒</div>
+        <h1>名前暗号化アプリ</h1>
+    </header>
+    
+    <div id="installBanner" class="install-banner">
+        <p>このアプリをホーム画面に追加できます</p>
+        <button id="installBtn" class="secondary">インストール</button>
+    </div>
+    
+    <div class="container">
+        <h2 class="section-title">暗号化</h2>
+        
+        <div class="form-group">
+            <label for="nameToEncrypt">暗号化する名前</label>
+            <input type="text" id="nameToEncrypt" placeholder="名前を入力してください">
+        </div>
+        
+        <div class="form-group">
+            <label for="encryptionKey">暗号化キー</label>
+            <input type="password" id="encryptionKey" placeholder="キーを入力してください">
+        </div>
+        
+        <button id="encryptBtn">暗号化する</button>
+        
+        <div class="result-label">暗号化結果:</div>
+        <div id="encryptedResult" class="result-box"></div>
+        
+        <button id="copyEncryptedBtn" class="secondary">コピーする</button>
+    </div>
+    
+    <div class="container">
+        <h2 class="section-title">復号化</h2>
+        
+        <div class="form-group">
+            <label for="textToDecrypt">復号する文字列</label>
+            <input type="text" id="textToDecrypt" placeholder="暗号化された文字列を入力してください">
+        </div>
+        
+        <div class="form-group">
+            <label for="decryptionKey">復号キー</label>
+            <input type="password" id="decryptionKey" placeholder="キーを入力してください">
+        </div>
+        
+        <button id="decryptBtn">復号する</button>
+        
+        <div class="result-label">復号結果:</div>
+        <div id="decryptedResult" class="result-box"></div>
+        
+        <button id="copyDecryptedBtn" class="secondary">コピーする</button>
+    </div>
+    
+    <div id="toast" class="toast"></div>
+    
+    <footer>
+        <p>© 2025 名前暗号化アプリ</p>
+        <p><a href="privacy-policy.html">プライバシーポリシー</a></p>
+    </footer>
+    
+    <script>
+        // Base58アルファベット
+        const ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+        const ALPHABET_MAP = {};
+        for (let i = 0; i < ALPHABET.length; i++) {
+            ALPHABET_MAP[ALPHABET.charAt(i)] = i;
+        }
+        
+        // Base58エンコード
+        function base58Encode(buffer) {
+            const bytes = new Uint8Array(buffer);
+            
+            // 先頭の0バイトをカウント
+            let zeros = 0;
+            for (let i = 0; i < bytes.length; i++) {
+                if (bytes[i] === 0) {
+                    zeros++;
+                } else {
+                    break;
+                }
+            }
+            
+            // Base58エンコード
+            let result = '';
+            const digits = Array.from(bytes);
+            
+            while (digits.length > 0) {
+                let carry = 0;
+                const newDigits = [];
+                
+                for (let i = 0; i < digits.length; i++) {
+                    carry = (carry << 8) + digits[i];
+                    
+                    if (carry === 0 && i === 0) {
+                        continue;
+                    }
+                    
+                    const remainder = carry % 58;
+                    carry = Math.floor(carry / 58);
+                    
+                    newDigits.push(remainder);
+                }
+                
+                result = ALPHABET.charAt(newDigits[0]) + result;
+                digits.splice(0, digits.length);
+                for (let i = 1; i < newDigits.length; i++) {
+                    digits.push(newDigits[i]);
+                }
+            }
+            
+            // 先頭の0バイトを'1'に変換
+            for (let i = 0; i < zeros; i++) {
+                result = '1' + result;
+            }
+            
+            return result;
+        }
+        
+        // Base58デコード
+        function base58Decode(str) {
+            if (str.length === 0) return new Uint8Array(0);
+            
+            // 先頭の'1'をカウント
+            let zeros = 0;
+            for (let i = 0; i < str.length; i++) {
+                if (str[i] === '1') {
+                    zeros++;
+                } else {
+                    break;
+                }
+            }
+            
+            // Base58デコード
+            const result = new Uint8Array(str.length * 2); // 十分なサイズを確保
+            let resultLength = 0;
+            
+            for (let i = zeros; i < str.length; i++) {
+                const c = str[i];
+                
+                if (c in ALPHABET_MAP) {
+                    let carry = ALPHABET_MAP[c];
+                    
+                    // 乗算と加算
+                    for (let j = 0; j < resultLength; j++) {
+                        carry += result[j] * 58;
+                        result[j] = carry & 0xff;
+                        carry >>= 8;
+                    }
+                    
+                    // キャリーを追加
+                    while (carry > 0) {
+                        result[resultLength++] = carry & 0xff;
+                        carry >>= 8;
+                    }
+                } else {
+                    throw new Error(`無効な文字: ${c}`);
+                }
+            }
+            
+            // 先頭の0を追加
+            const finalResult = new Uint8Array(zeros + resultLength);
+            for (let i = 0; i < resultLength; i++) {
+                finalResult[i + zeros] = result[resultLength - 1 - i];
+            }
+            
+            return finalResult;
+        }
+        
+        // SHA-256によるキーの生成
+        async function deriveKey(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            
+            return await crypto.subtle.importKey(
+                'raw',
+                hashBuffer,
+                { name: 'AES-GCM' },
+                false,
+                ['encrypt', 'decrypt']
+            );
+        }
+        
+        // 暗号化関数
+        async function encrypt(text, password) {
+            try {
+                if (!text || !password) {
+                    throw new Error('テキストとキーを入力してください');
+                }
+                
+                const encoder = new TextEncoder();
+                const data = encoder.encode(text);
+                
+                // キーの生成
+                const key = await deriveKey(password);
+                
+                // IVの生成（12バイト）
+                const iv = crypto.getRandomValues(new Uint8Array(12));
+                
+                // 暗号化
+                const encrypted = await crypto.subtle.encrypt(
+                    {
+                        name: 'AES-GCM',
+                        iv: iv
+                    },
+                    key,
+                    data
+                );
+                
+                // IVと暗号文を結合
+                const result = new Uint8Array(iv.length + encrypted.byteLength);
+                result.set(iv);
+                result.set(new Uint8Array(encrypted), iv.length);
+                
+                // Base58エンコード
+                return base58Encode(result);
+            } catch (error) {
+                throw new Error(`暗号化エラー: ${error.message}`);
+            }
+        }
+        
+        // 復号化関数
+        async function decrypt(encryptedText, password) {
+            try {
+                if (!encryptedText || !password) {
+                    throw new Error('暗号文とキーを入力してください');
+                }
+                
+                // Base58デコード
+                const data = base58Decode(encryptedText);
+                
+                // IVと暗号文を分離
+                const iv = data.slice(0, 12);
+                const ciphertext = data.slice(12);
+                
+                // キーの生成
+                const key = await deriveKey(password);
+                
+                // 復号化
+                const decrypted = await crypto.subtle.decrypt(
+                    {
+                        name: 'AES-GCM',
+                        iv: iv
+                    },
+                    key,
+                    ciphertext
+                );
+                
+                // テキストに変換
+                const decoder = new TextDecoder();
+                return decoder.decode(decrypted);
+            } catch (error) {
+                throw new Error(`復号化エラー: ${error.message}`);
+            }
+        }
+        
+        // トースト表示関数
+        function showToast(message, duration = 3000) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        }
+        
+        // クリップボードにコピー
+        function copyToClipboard(text) {
+            if (!text) return;
+            
+            navigator.clipboard.writeText(text)
+                .then(() => {
+                    showToast('コピーしました');
+                })
+                .catch(err => {
+                    showToast('コピーに失敗しました');
+                    console.error('コピーエラー:', err);
+                });
+        }
+        
+        // イベントリスナーの設定
+        document.addEventListener('DOMContentLoaded', () => {
+            const nameToEncrypt = document.getElementById('nameToEncrypt');
+            const encryptionKey = document.getElementById('encryptionKey');
+            const encryptBtn = document.getElementById('encryptBtn');
+            const encryptedResult = document.getElementById('encryptedResult');
+            const copyEncryptedBtn = document.getElementById('copyEncryptedBtn');
+            
+            const textToDecrypt = document.getElementById('textToDecrypt');
+            const decryptionKey = document.getElementById('decryptionKey');
+            const decryptBtn = document.getElementById('decryptBtn');
+            const decryptedResult = document.getElementById('decryptedResult');
+            const copyDecryptedBtn = document.getElementById('copyDecryptedBtn');
+            
+            // 暗号化ボタン
+            encryptBtn.addEventListener('click', async () => {
+                try {
+                    const result = await encrypt(nameToEncrypt.value, encryptionKey.value);
+                    encryptedResult.textContent = result;
+                } catch (error) {
+                    showToast(error.message);
+                    console.error(error);
+                }
+            });
+            
+            // 暗号化結果コピーボタン
+            copyEncryptedBtn.addEventListener('click', () => {
+                copyToClipboard(encryptedResult.textContent);
+            });
+            
+            // 復号化ボタン
+            decryptBtn.addEventListener('click', async () => {
+                try {
+                    const result = await decrypt(textToDecrypt.value, decryptionKey.value);
+                    decryptedResult.textContent = result;
+                } catch (error) {
+                    showToast(error.message);
+                    console.error(error);
+                }
+            });
+            
+            // 復号化結果コピーボタン
+            copyDecryptedBtn.addEventListener('click', () => {
+                copyToClipboard(decryptedResult.textContent);
+            });
+        });
+        
+        // Service Workerの登録
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker登録成功:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker登録失敗:', error);
+                    });
+            });
+        }
+        
+        // PWAインストールイベント
+        let deferredPrompt;
+        const installBanner = document.getElementById('installBanner');
+        const installBtn = document.getElementById('installBtn');
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // インストールプロンプトを表示しない
+            e.preventDefault();
+            // イベントを保存
+            deferredPrompt = e;
+            // インストールバナーを表示
+            installBanner.style.display = 'block';
+        });
+        
+        installBtn.addEventListener('click', () => {
+            // バナーを非表示
+            installBanner.style.display = 'none';
+            // プロンプトを表示
+            deferredPrompt.prompt();
+            // ユーザーの選択を待つ
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('アプリがインストールされました');
+                } else {
+                    console.log('インストールがキャンセルされました');
+                }
+                deferredPrompt = null;
+            });
+        });
+    </script>
+</body>
+</html>
