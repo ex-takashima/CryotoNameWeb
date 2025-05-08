@@ -17,10 +17,6 @@
 
 [ライブデモを見る](https://git.exlabo.jp)
 
-## スクリーンショット
-
-![アプリのスクリーンショット](screenshots/screenshot.jpg)
-
 ## 技術
 
 このアプリは以下の技術を使用しています：
