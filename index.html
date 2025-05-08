@@ -189,7 +189,7 @@
         
         <div class="form-group">
             <label for="encryptionKey">暗号化キー</label>
-            <input type="password" id="encryptionKey" placeholder="キーを入力してください">
+            <input type="text" id="encryptionKey" placeholder="キーを入力してください">
         </div>
         
         <button id="encryptBtn">暗号化する</button>
@@ -210,7 +210,7 @@
         
         <div class="form-group">
             <label for="decryptionKey">復号キー</label>
-            <input type="password" id="decryptionKey" placeholder="キーを入力してください">
+            <input type="text" id="decryptionKey" placeholder="キーを入力してください">
         </div>
         
         <button id="decryptBtn">復号する</button>
@@ -225,115 +225,81 @@
     
     <footer>
         <p>© 2025 名前暗号化アプリ</p>
-        <p><a href="privacy-policy.html">プライバシーポリシー</a></p>
+        <p><a href="./privacy-policy.html">プライバシーポリシー</a></p>
     </footer>
     
     <script>
         // Base58アルファベット
         const ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
-        const ALPHABET_MAP = {};
-        for (let i = 0; i < ALPHABET.length; i++) {
-            ALPHABET_MAP[ALPHABET.charAt(i)] = i;
-        }
         
-        // Base58エンコード
+        // Base58エンコード - シンプル化した実装
         function base58Encode(buffer) {
+            // ArrayBufferをUint8Arrayに変換
             const bytes = new Uint8Array(buffer);
             
-            // 先頭の0バイトをカウント
+            // BigIntを使ったBase58エンコード（より安定した実装）
+            const BASE = 58n;
+            
+            // 先頭の0バイトをカウント（1に変換するため）
             let zeros = 0;
-            for (let i = 0; i < bytes.length; i++) {
-                if (bytes[i] === 0) {
-                    zeros++;
-                } else {
-                    break;
-                }
+            for (let i = 0; i < bytes.length && bytes[i] === 0; i++) {
+                zeros++;
             }
             
-            // Base58エンコード
-            let result = '';
-            const digits = Array.from(bytes);
+            // バイト配列をBigIntに変換
+            let num = 0n;
+            for (let i = 0; i < bytes.length; i++) {
+                num = num * 256n + BigInt(bytes[i]);
+            }
             
-            while (digits.length > 0) {
-                let carry = 0;
-                const newDigits = [];
-                
-                for (let i = 0; i < digits.length; i++) {
-                    carry = (carry << 8) + digits[i];
-                    
-                    if (carry === 0 && i === 0) {
-                        continue;
-                    }
-                    
-                    const remainder = carry % 58;
-                    carry = Math.floor(carry / 58);
-                    
-                    newDigits.push(remainder);
-                }
-                
-                result = ALPHABET.charAt(newDigits[0]) + result;
-                digits.splice(0, digits.length);
-                for (let i = 1; i < newDigits.length; i++) {
-                    digits.push(newDigits[i]);
-                }
+            // BigIntをBase58文字列に変換
+            let encoded = '';
+            while (num > 0n) {
+                const mod = Number(num % BASE);
+                encoded = ALPHABET[mod] + encoded;
+                num = num / BASE;
             }
             
             // 先頭の0バイトを'1'に変換
-            for (let i = 0; i < zeros; i++) {
-                result = '1' + result;
-            }
-            
-            return result;
+            return '1'.repeat(zeros) + encoded;
         }
         
-        // Base58デコード
-        function base58Decode(str) {
-            if (str.length === 0) return new Uint8Array(0);
+        // Base58デコード - シンプル化した実装
+        function base58Decode(encoded) {
+            if (!encoded || encoded.length === 0) {
+                return new Uint8Array(0);
+            }
             
-            // 先頭の'1'をカウント
+            // 先頭の'1'をカウント（0バイトに変換するため）
             let zeros = 0;
-            for (let i = 0; i < str.length; i++) {
-                if (str[i] === '1') {
-                    zeros++;
-                } else {
-                    break;
-                }
+            for (let i = 0; i < encoded.length && encoded[i] === '1'; i++) {
+                zeros++;
             }
             
-            // Base58デコード
-            const result = new Uint8Array(str.length * 2); // 十分なサイズを確保
-            let resultLength = 0;
+            // Base58文字列をBigIntに変換
+            let num = 0n;
+            const BASE = 58n;
             
-            for (let i = zeros; i < str.length; i++) {
-                const c = str[i];
+            for (let i = zeros; i < encoded.length; i++) {
+                const char = encoded[i];
+                const charIndex = ALPHABET.indexOf(char);
                 
-                if (c in ALPHABET_MAP) {
-                    let carry = ALPHABET_MAP[c];
-                    
-                    // 乗算と加算
-                    for (let j = 0; j < resultLength; j++) {
-                        carry += result[j] * 58;
-                        result[j] = carry & 0xff;
-                        carry >>= 8;
-                    }
-                    
-                    // キャリーを追加
-                    while (carry > 0) {
-                        result[resultLength++] = carry & 0xff;
-                        carry >>= 8;
-                    }
-                } else {
-                    throw new Error(`無効な文字: ${c}`);
+                if (charIndex === -1) {
+                    throw new Error(`無効な文字: ${char}`);
                 }
+                
+                num = num * BASE + BigInt(charIndex);
             }
             
-            // 先頭の0を追加
-            const finalResult = new Uint8Array(zeros + resultLength);
-            for (let i = 0; i < resultLength; i++) {
-                finalResult[i + zeros] = result[resultLength - 1 - i];
+            // BigIntをバイト配列に変換
+            const bytes = [];
+            while (num > 0n) {
+                bytes.unshift(Number(num % 256n));
+                num = num / 256n;
             }
             
-            return finalResult;
+            // 先頭に0バイトを追加
+            return new Uint8Array([...Array(zeros).fill(0), ...bytes]);
         }
         
         // SHA-256によるキーの生成
@@ -385,6 +351,7 @@
                 // Base58エンコード
                 return base58Encode(result);
             } catch (error) {
+                console.error('暗号化エラー:', error);
                 throw new Error(`暗号化エラー: ${error.message}`);
             }
         }
@@ -398,6 +365,10 @@
                 
                 // Base58デコード
                 const data = base58Decode(encryptedText);
+                
+                if (data.length < 12) {
+                    throw new Error('無効な暗号文です');
+                }
                 
                 // IVと暗号文を分離
                 const iv = data.slice(0, 12);
@@ -420,6 +391,7 @@
                 const decoder = new TextDecoder();
                 return decoder.decode(decrypted);
             } catch (error) {
+                console.error('復号化エラー:', error);
                 throw new Error(`復号化エラー: ${error.message}`);
             }
         }
@@ -466,11 +438,12 @@
             // 暗号化ボタン
             encryptBtn.addEventListener('click', async () => {
                 try {
+                    encryptedResult.textContent = '処理中...';
                     const result = await encrypt(nameToEncrypt.value, encryptionKey.value);
                     encryptedResult.textContent = result;
                 } catch (error) {
+                    encryptedResult.textContent = '';
                     showToast(error.message);
-                    console.error(error);
                 }
             });
             
@@ -482,11 +455,12 @@
             // 復号化ボタン
             decryptBtn.addEventListener('click', async () => {
                 try {
+                    decryptedResult.textContent = '処理中...';
                     const result = await decrypt(textToDecrypt.value, decryptionKey.value);
                     decryptedResult.textContent = result;
                 } catch (error) {
+                    decryptedResult.textContent = '';
                     showToast(error.message);
-                    console.error(error);
                 }
             });
             
