@@ -19,7 +19,7 @@
 
 ## スクリーンショット
 
-![アプリのスクリーンショット](screenshots/screenshot.png)
+![アプリのスクリーンショット](screenshots/screenshot.jpg)
 
 ## 技術
 
