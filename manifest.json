@@ -1,7 +1,7 @@
 {
-  "name": "名前暗号化アプリ",
+  "name": "暗号化アプリ",
   "short_name": "暗号化アプリ",
-  "description": "名前やテキストを安全に暗号化・復号化するためのツール",
+  "description": "テキストを安全に暗号化・復号化するためのツール",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
